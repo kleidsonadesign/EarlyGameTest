@@ -1,1 +1,1 @@
-Codito feito para apredizagem sobre html, CSS e JavaScript
+Codigo feito para apredizagem sobre html, CSS e JavaScript
