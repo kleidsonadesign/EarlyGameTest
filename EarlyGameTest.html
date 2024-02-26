@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Early Game Test</title>
+  <link rel="icon" href="https://raw.githubusercontent.com/kleidsonadesign/EarlyGameTest/main/logoegt.png" type="image/png"> // ICON
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            background-color: white; /* Fundo branco */
+        }
+
+        #menu {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #menu ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menuItem {
+            margin-bottom: 5px;
+            font-family: 'Ascender Sans WGL Bold', sans-serif;
+            font-style: italic;
+            cursor: pointer;
+            padding: 7px;
+            border-radius: 10px;
+            border: 2px solid #a44fc0;
+            width: 350px;
+        }
+
+        .menuItem a {
+            text-decoration: none;
+            color: #a44fc0;
+            font-size: 24px;
+            transition: color 0.3s;
+        }
+
+        .menuItem:hover a {
+            color: #99d4df;
+        }
+
+        #imagemSuperior {
+            width: 100%;
+            height: auto;
+            max-height: 325px;
+            margin-bottom: 20px;
+            user-select: none;
+        }
+
+        .bola {
+            width: 54px;
+            height: 54px;
+            background-color: green;
+            border-radius: 50%;
+            cursor: pointer;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #tempoResposta {
+            margin: 30px;
+            font-size: 28px;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            color: red;
+            text-shadow: 2px 2px 2px black;
+            user-select: none;
+        }
+
+        #betaText {
+            font-family: 'Ascender Sans WGL Bold', sans-serif;
+            font-size: 30px;
+            font-style: italic;
+            color: red;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <img id="imagemSuperior" src="https://raw.githubusercontent.com/kleidsonadesign/EarlyGameTest/main/EGT.png" alt="Logo">
+    </header>
+
+    <div id="betaText">BETA</div>
+
+    <div id="menu">
+        <ul>
+            <li class="menuItem"><a href="#" onclick="iniciarTreino()">TESTE DE RESPOSTA CEREBRAL</a></li> 
+		↓ Desativado no momento ↓
+			<li class="menuItem"><a href="#" onclick="iniciarTeste()">Teste do Monitor</a></li>
+            <li class="menuItem"><a href="#">Ping</a></li>
+            
+        </ul>
+		
+    </div>
+
+    <script>
+        let treinoAtivo = false;
+        let tempoInicio;
+        let numCliques = 0;
+        let somaTempos = 0;
+
+        function iniciarTreino() {
+            const menu = document.getElementById('menu');
+            menu.style.display = 'none';
+
+            treinoAtivo = true;
+            criarBola();
+        }
+
+        function iniciarTeste() {
+            // Adicione o código necessário para o teste de monitor, se necessário
+        }
+
+        function definirCor(tempo) {
+            if (tempo > 650) {
+                return 'red';
+            } else if (tempo >= 480 && tempo <= 650) {
+                return 'yellow';
+            } else {
+                return 'green';
+            }
+        }
+
+        function criarBola() {
+            const bola = document.createElement('div');
+            bola.classList.add('bola');
+            document.body.appendChild(bola);
+
+            const tempoResposta = document.createElement('div');
+            tempoResposta.id = 'tempoResposta';
+            document.body.appendChild(tempoResposta);
+
+            bola.onclick = function () {
+                const minX = -150;
+                const minY = -150;
+                const maxX = 300;
+                const maxY = 300;
+
+                const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+                const randomY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+
+                bola.style.left = `calc(50% + ${randomX}px)`;
+                bola.style.top = `calc(50% + ${randomY}px)`;
+
+                if (treinoAtivo) {
+                    const tempoFim = new Date().getTime();
+                    const tempoRespostaValor = tempoFim - tempoInicio;
+                    const cor = definirCor(tempoRespostaValor);
+
+                    tempoResposta.style.color = cor;
+                    tempoResposta.innerText = `Tempo de resposta: ${tempoRespostaValor}ms`;
+
+                    numCliques++;
+                    somaTempos += tempoRespostaValor;
+
+                    if (numCliques === 25) {
+                        const media = somaTempos / numCliques;
+                        alert(`Média do tempo de resposta após 25 cliques: ${media.toFixed(2)}ms`);
+                        treinoAtivo = false;
+                        resetarTreino();
+                    }
+
+                    tempoInicio = tempoFim; // Atualiza o tempo de início para o próximo clique
+                }
+            };
+        }
+
+        function resetarTreino() {
+            const menu = document.getElementById('menu');
+            menu.style.display = 'block';
+
+            const bola = document.querySelector('.bola');
+            if (bola) {
+                document.body.removeChild(bola);
+            }
+
+            const tempoResposta = document.getElementById('tempoResposta');
+            if (tempoResposta) {
+                document.body.removeChild(tempoResposta);
+            }
+
+            numCliques = 0;
+            somaTempos = 0;
+        }
+    </script>
+
+</body>
+
+</html>
